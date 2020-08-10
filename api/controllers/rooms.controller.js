@@ -5,12 +5,13 @@ const {
 } = require('../constants/httpStatus.constant');
 const Room = require('../../models/room.model');
 const User = require('../../models/user.model');
+const _io = require('../../socket/socket.emitter');
 
 module.exports.index = async (req, res) => {
   const { email } = req.user;
 
   const user = await User.findOne({ email });
-  const rooms = await Room.find({ members: user.id });
+  const rooms = await Room.find({ members: user._id });
 
   return res.status(OK_STATUS).json(rooms);
 };
@@ -50,7 +51,7 @@ module.exports.postCreate = async (req, res) => {
     roomName,
     password: roomPassword,
     admin: user.id,
-    members: [user._id],
+    members: [user._id, 'system'],
   });
 
   // Save and return data
@@ -88,12 +89,24 @@ module.exports.postJoin = async (req, res) => {
     return res.status(BAD_REQUEST_STATUS).send('Password is incorrect.');
   }
 
-  // Join member in room
+  // Join member in room and create notification.
   const user = await User.findOne({ email });
-  await room.updateOne({ $push: { members: user._id } });
   await user.updateOne({ $push: { rooms: room.id } });
+  const messNoti = {
+    author: 'system',
+    content: `${user.userName} has joined room.`,
+  };
+  await room.updateOne({ $push: { members: user._id, messages: messNoti } });
+  const updatedRoom = await Room.findOne({ roomName: roomJoinName });
 
   // Return client rooms
   const rooms = await Room.find({ members: user._id });
+
+  // Emit socket
+  const members = await User.find({ rooms: room._id });
+  _io
+    .to(room._id)
+    .emit('replyJoinRoom', { members, messages: updatedRoom.messages });
+
   return res.status(OK_STATUS).json({ rooms, updatedRoom: room });
 };

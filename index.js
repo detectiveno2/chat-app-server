@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const socketio = require('socket.io');
+const redis = require('socket.io-redis');
 
 dotenv.config();
 const app = express();
@@ -43,12 +45,13 @@ app.get('/', (req, res) => {
 });
 
 // SocketIO
-const socketio = require('socket.io');
 const io = socketio(server);
+io.adapter(redis({ host: 'localhost', port: 6379 }));
 
 io.on('connect', (socket) => {
   console.log(`${socket.id} has connected.`);
   // Room listener
+  roomListener.connectPersonalRoom(socket);
   roomListener.connectRooms(socket);
   roomListener.createRoom(socket);
   roomListener.joinRoom(socket);

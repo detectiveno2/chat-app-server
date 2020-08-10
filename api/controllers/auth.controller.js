@@ -23,8 +23,10 @@ module.exports.index = async (req, res) => {
   // Check if wrong token
   const jwtToken = token.split(' ')[1];
   try {
-    jwt.verify(jwtToken, process.env.JWT_SECRET_KEY);
-    return res.sendStatus(NO_CONTENT_STATUS);
+    const data = jwt.verify(jwtToken, process.env.JWT_SECRET_KEY);
+    const user = await User.findOne({ email: data.email });
+
+    return res.status(OK_STATUS).send(user);
   } catch (error) {
     return res.status(FORBIDDEN_STATUS).send('Wrong token.');
   }

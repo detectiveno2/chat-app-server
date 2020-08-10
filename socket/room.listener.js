@@ -1,4 +1,14 @@
 const roomListener = {
+  connectPersonalRoom: (socket) => {
+    const event = 'connectPersonalRoom';
+
+    return socket.on(event, (data) => {
+      const room = data;
+
+      socket.join(room);
+    });
+  },
+
   connectRooms: (socket) => {
     const event = 'connectRooms';
 
@@ -26,7 +36,6 @@ const roomListener = {
     return socket.on(event, (data) => {
       const room = data;
       socket.join(room._id);
-      socket.to(room._id).emit('replyJoinRoom');
     });
   },
 };
