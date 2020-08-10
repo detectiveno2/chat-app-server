@@ -45,19 +45,24 @@ module.exports.postCreate = async (req, res) => {
     return res.status(BAD_REQUEST_STATUS).send('Room name is taken.');
   }
 
-  // Create new room
+  // Create new room.
   const user = await User.findOne({ email });
+  const messNoti = {
+    author: 'system',
+    content: `${user.userName} has created room.`,
+  };
   const newRoom = new Room({
     roomName,
     password: roomPassword,
     admin: user.id,
     members: [user._id, 'system'],
+    messages: [messNoti],
   });
 
-  // Save and return data
+  // Save and return data.
   try {
     const createdRoom = await newRoom.save();
-    // Add room for user
+    // Add room for user.
     await User.updateOne({ email }, { $push: { rooms: createdRoom.id } });
     const rooms = await Room.find({ members: user._id });
 
@@ -99,10 +104,10 @@ module.exports.postJoin = async (req, res) => {
   await room.updateOne({ $push: { members: user._id, messages: messNoti } });
   const updatedRoom = await Room.findOne({ roomName: roomJoinName });
 
-  // Return client rooms
+  // Return client rooms.
   const rooms = await Room.find({ members: user._id });
 
-  // Emit socket
+  // Emit socket.
   const members = await User.find({ rooms: room._id });
   _io
     .to(room._id)
