@@ -45,20 +45,23 @@ app.get('/', (req, res) => {
 });
 
 // SocketIO
+const hostPortRedis = { host: 'localhost', port: 6379 };
 const io = socketio(server);
-io.adapter(redis({ host: 'localhost', port: 6379 }));
+
+if (process.env.REDIS_URL) {
+  io.adapter(redis(process.env.REDIS_URL));
+} else {
+  io.adapter(redis(hostPortRedis));
+}
 
 io.on('connect', (socket) => {
-  console.log(`${socket.id} has connected.`);
   // Room listener
   roomListener.connectPersonalRoom(socket);
   roomListener.connectRooms(socket);
   roomListener.createRoom(socket);
   roomListener.joinRoom(socket);
 
-  socket.on('disconnect', () => {
-    console.log('Disconnected.');
-  });
+  socket.on('disconnect', () => {});
 });
 
 // Listen server
