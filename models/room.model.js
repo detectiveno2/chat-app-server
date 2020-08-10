@@ -12,7 +12,7 @@ const roomSchema = mongoose.Schema({
   members: [{ type: mongoose.Schema.Types.Mixed, default: ['system'] }],
   avatarGroupUrl: {
     type: String,
-    default: `${process.env.BASE_URL}img/default-avatar-group.jpg`,
+    default: process.env.GROUP_AVATAR_URL,
   },
   password: { type: String, require: true },
   messages: [{ type: messageSchema, default: [] }],

@@ -6,7 +6,6 @@ const User = require('../../models/user.model');
 const {
   OK_STATUS,
   CREATED_STATUS,
-  NO_CONTENT_STATUS,
   BAD_REQUEST_STATUS,
   UNAUTHORIZED_STATUS,
   FORBIDDEN_STATUS,
@@ -53,7 +52,7 @@ module.exports.postRegister = async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, salt);
 
   // Create default avatar
-  const avatarUrl = `${process.env.BASE_URL}img/default-avatar.png`;
+  const avatarUrl = process.env.DEFAULT_AVATAR_URL;
 
   // Create new user
   const newUser = new User({
