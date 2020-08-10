@@ -59,7 +59,7 @@ module.exports.postCreate = async (req, res) => {
     const createdRoom = await newRoom.save();
     // Add room for user
     await User.updateOne({ email }, { $push: { rooms: createdRoom.id } });
-    const rooms = await Room.find({ members: user.id });
+    const rooms = await Room.find({ members: user._id });
 
     return res.status(CREATED_STATUS).json({ rooms, createdRoom: newRoom });
   } catch (error) {
