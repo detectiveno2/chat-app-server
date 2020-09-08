@@ -6,7 +6,7 @@ This is a server-side for pet chat-app-project.
 
 ## Description
 
-A pet project chat-app realtime using [Express](http://expressjs.com/), [MongoDB Cloud](https://www.mongodb.com/cloud), [SocketIO](https://socket.io/)
+A pet project chat-app realtime using [Express](http://expressjs.com/), [MongoDB Cloud](https://www.mongodb.com/cloud), [SocketIO](https://socket.io/), [ReactJS](https://reactjs.org/)
 
 ## Installation
 
